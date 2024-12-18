@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock, Paper, Scissors Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Rock, Paper, Scissors Game</h1>
+        <p>Enter your name to start the game:</p>
+        <input type="text" id="player-name" placeholder="Enter your name" required>
+        <button onclick="startGame()">Start Game</button>
+    </div>
+
+    <script>
+        function startGame() {
+            const playerName = document.getElementById('player-name').value.trim();
+            if (playerName === "") {
+                alert("Please enter your name!");
+                return;
+            }
+
+            resetGameData(playerName);
+
+            window.location.href = 'game.html';
+        }
+
+        function resetGameData(playerName) {
+            localStorage.removeItem('roundsPlayed');
+            localStorage.removeItem('playerStats');
+
+            localStorage.setItem('playerName', playerName);
+
+            localStorage.setItem('roundsPlayed', 0);
+
+        }
+    </script>
+</body>
+</html>

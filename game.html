@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock, Paper, Scissors Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Rock, Paper, Scissors Game</h1>
+        <div id="computer-choice">
+            <h3>Computer's Choice</h3>
+            <img id="computer-img" src="images/default.png" alt="Computer Choice" width="100" height="100">
+        </div>        
+        <div id="user-choice">
+            <h3>Your Choice</h3>
+            <img id="user-img" src="images/default.png" alt="User Choice" width="100" height="100">
+        </div>
+        <div>
+            <button onclick="playGame('rock')">Rock</button>
+            <button onclick="playGame('paper')">Paper</button>
+            <button onclick="playGame('scissors')">Scissors</button>
+        </div>
+
+        <div id="result">
+            <h2 id="result-text"></h2>
+        </div>
+
+        <button onclick="window.location.href='Leaderboard.html'">Leaderboard</button>
+    </div>
+
+    <script>
+        const playerName = localStorage.getItem('playerName');
+        if (!playerName) {
+            alert("No player name found. Please go back to the index page.");
+            window.location.href = 'index.html'; 
+        }
+
+        let startTime = 0; 
+        let gameStartTime = 0; 
+
+     
+        function playGame(userChoice) {
+            startTime = Date.now();  
+
+
+            const choices = ['rock', 'paper', 'scissors'];
+            const computerChoice = choices[Math.floor(Math.random() * 3)];
+
+
+            document.getElementById('user-img').src = `images/${userChoice}.png`;
+            document.getElementById('computer-img').src = `images/${computerChoice}.png`;
+            const result = determineWinner(userChoice, computerChoice);
+            document.getElementById('result-text').textContent = result;
+
+ 
+            const roundTime = (Date.now() - startTime) / 1000; 
+
+
+            updateLeaderboard(result === 'You win!', result === 'Computer wins!', result === 'It\'s a draw!', roundTime);
+        }
+
+
+        function determineWinner(userChoice, computerChoice) {
+            if (userChoice === computerChoice) {
+                return "It's a draw!";
+            }
+
+            if (
+                (userChoice === 'rock' && computerChoice === 'scissors') ||
+                (userChoice === 'paper' && computerChoice === 'rock') ||
+                (userChoice === 'scissors' && computerChoice === 'paper')
+            ) {
+                return "You win!";
+            } else {
+                return "Computer wins!";
+            }
+        }
+
+
+        function updateLeaderboard(isWin, isLoss, isDraw, roundTime) {
+            let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+
+
+            let player = leaderboard.find(entry => entry.name === playerName);
+
+            if (!player) {
+           
+                player = { name: playerName, wins: 0, losses: 0, draws: 0, avgTime: 0, gamesPlayed: 0, totalTime: 0 };
+                leaderboard.push(player);
+            }
+
+
+            if (isWin) player.wins++;
+            if (isLoss) player.losses++;
+            if (isDraw) player.draws++;
+            player.gamesPlayed++;
+            player.totalTime += roundTime; 
+
+
+            player.avgTime = player.totalTime / player.gamesPlayed;
+
+
+            localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+
+            loadLeaderboard();
+        }
+
+        function loadLeaderboard() {
+            const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+            const tbody = document.querySelector('#leaderboard tbody');
+            tbody.innerHTML = ''; 
+
+            leaderboard.forEach(entry => {
+                const row = document.createElement('tr');
+                const nameCell = document.createElement('td');
+                const winsCell = document.createElement('td');
+                const lossesCell = document.createElement('td');
+                const drawsCell = document.createElement('td');
+                const avgTimeCell = document.createElement('td');
+
+                nameCell.textContent = entry.name;
+                winsCell.textContent = entry.wins;
+                lossesCell.textContent = entry.losses;
+                drawsCell.textContent = entry.draws;
+                avgTimeCell.textContent = entry.avgTime.toFixed(2);
+
+                row.appendChild(nameCell);
+                row.appendChild(winsCell);
+                row.appendChild(lossesCell);
+                row.appendChild(drawsCell);
+                row.appendChild(avgTimeCell);
+                tbody.appendChild(row);
+            });
+        }
+
+        window.onload = loadLeaderboard;
+    </script>
+</body>
+</html>

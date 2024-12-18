@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard - Rock, Paper, Scissors</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Leaderboard</h1>
+
+        <table id="leaderboard">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Wins</th>
+                    <th>Losses</th>
+                    <th>Draws</th>
+                    <th>Avg Time (s)</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <button onclick="window.location.href='game.html'">Back to Game</button>
+        <button onclick="window.location.href='index.html'">New Game</button>
+
+        <button onclick="clearLeaderboard()">Clear Leaderboard</button>
+    </div>
+
+    <script>
+        function loadLeaderboard() {
+            const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+            const tbody = document.querySelector('#leaderboard tbody');
+            tbody.innerHTML = ''; 
+
+            leaderboard.forEach(entry => {
+                const row = document.createElement('tr');
+                const nameCell = document.createElement('td');
+                const winsCell = document.createElement('td');
+                const lossesCell = document.createElement('td');
+                const drawsCell = document.createElement('td');
+                const avgTimeCell = document.createElement('td');
+
+                nameCell.textContent = entry.name;
+                winsCell.textContent = entry.wins;
+                lossesCell.textContent = entry.losses;
+                drawsCell.textContent = entry.draws;
+                avgTimeCell.textContent = entry.avgTime.toFixed(2);  
+
+                row.appendChild(nameCell);
+                row.appendChild(winsCell);
+                row.appendChild(lossesCell);
+                row.appendChild(drawsCell);
+                row.appendChild(avgTimeCell);
+                tbody.appendChild(row);
+            });
+        }
+
+        function clearLeaderboard() {
+            localStorage.removeItem('leaderboard');
+            loadLeaderboard();  
+        }
+
+        window.onload = loadLeaderboard;
+    </script>
+</body>
+</html>
