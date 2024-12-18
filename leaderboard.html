@@ -10,10 +10,15 @@
     <div class="container">
         <h1>Leaderboard</h1>
 
+        <div id="dashboard">
+            <p><strong>Total Games Played:</strong> <span id="gameCount">0</span></p>
+        </div>
+
         <table id="leaderboard">
             <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Moves</th>
                     <th>Wins</th>
                     <th>Losses</th>
                     <th>Draws</th>
@@ -25,42 +30,86 @@
 
         <button onclick="window.location.href='game.html'">Back to Game</button>
         <button onclick="window.location.href='index.html'">New Game</button>
-
         <button onclick="clearLeaderboard()">Clear Leaderboard</button>
     </div>
 
     <script>
         function loadLeaderboard() {
             const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+
+            leaderboard.sort((a, b) => b.wins - a.wins);
+
             const tbody = document.querySelector('#leaderboard tbody');
             tbody.innerHTML = ''; 
 
             leaderboard.forEach(entry => {
                 const row = document.createElement('tr');
                 const nameCell = document.createElement('td');
+                const gamesPlayedCell = document.createElement('td');
                 const winsCell = document.createElement('td');
                 const lossesCell = document.createElement('td');
                 const drawsCell = document.createElement('td');
                 const avgTimeCell = document.createElement('td');
 
                 nameCell.textContent = entry.name;
-                winsCell.textContent = entry.wins;
-                lossesCell.textContent = entry.losses;
-                drawsCell.textContent = entry.draws;
-                avgTimeCell.textContent = entry.avgTime.toFixed(2);  
+                gamesPlayedCell.textContent = entry.gamesPlayed || 0; 
+                winsCell.textContent = entry.wins || 0;
+                lossesCell.textContent = entry.losses || 0;
+                drawsCell.textContent = entry.draws || 0;
+                avgTimeCell.textContent = entry.avgTime ? entry.avgTime.toFixed(2) : '0.00';
 
                 row.appendChild(nameCell);
+                row.appendChild(gamesPlayedCell);
                 row.appendChild(winsCell);
                 row.appendChild(lossesCell);
                 row.appendChild(drawsCell);
                 row.appendChild(avgTimeCell);
                 tbody.appendChild(row);
             });
+
+            const gameCount = localStorage.getItem('gameCount') || 0;
+            document.getElementById('gameCount').textContent = gameCount;
         }
 
         function clearLeaderboard() {
             localStorage.removeItem('leaderboard');
-            loadLeaderboard();  
+            loadLeaderboard(); 
+        }
+
+        function incrementGameCount() {
+            let gameCount = parseInt(localStorage.getItem('gameCount')) || 0;
+            gameCount += 1;
+            localStorage.setItem('gameCount', gameCount);
+        }
+
+        function updateLeaderboard(playerName, result, roundTime) {
+            const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+
+            let player = leaderboard.find(entry => entry.name === playerName);
+            if (!player) {
+                player = {
+                    name: playerName,
+                    wins: 0,
+                    losses: 0,
+                    draws: 0,
+                    gamesPlayed: 0,
+                    avgTime: 0,
+                    totalTime: 0  
+                };
+                leaderboard.push(player);
+            }
+
+            player.gamesPlayed += 1;
+            if (result === 'win') player.wins += 1;
+            else if (result === 'loss') player.losses += 1;
+            else if (result === 'draw') player.draws += 1;
+
+            player.totalTime += roundTime;
+            player.avgTime = player.totalTime / player.gamesPlayed; 
+
+            localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+
+            incrementGameCount();
         }
 
         window.onload = loadLeaderboard;
