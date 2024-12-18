@@ -11,11 +11,11 @@
         <h1>Rock, Paper, Scissors Game</h1>
         <div id="computer-choice">
             <h3>Computer's Choice</h3>
-            <img id="computer-img" src="images/default.png" alt="Computer Choice" width="100" height="100">
+            <img id="computer-img" src="default.png" alt="Computer Choice" width="100" height="100">
         </div>        
         <div id="user-choice">
             <h3>Your Choice</h3>
-            <img id="user-img" src="images/default.png" alt="User Choice" width="100" height="100">
+            <img id="user-img" src="default.png" alt="User Choice" width="100" height="100">
         </div>
         <div>
             <button onclick="playGame('rock')">Rock</button>
@@ -49,8 +49,8 @@
             const computerChoice = choices[Math.floor(Math.random() * 3)];
 
 
-            document.getElementById('user-img').src = `images/${userChoice}.png`;
-            document.getElementById('computer-img').src = `images/${computerChoice}.png`;
+            document.getElementById('user-img').src = `${userChoice}.png`;
+            document.getElementById('computer-img').src = `${computerChoice}.png`;
             const result = determineWinner(userChoice, computerChoice);
             document.getElementById('result-text').textContent = result;
 
